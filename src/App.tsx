@@ -5,7 +5,9 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <DelayedData />
+      <DelayedData wait={500} index={0} />
+      <DelayedData wait={3000} index={1} />
+      <DelayedData wait={5000} index={2} />
     </QueryClientProvider>
   );
 }
