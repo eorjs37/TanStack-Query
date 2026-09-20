@@ -45,3 +45,85 @@ export default function DelayedData({ wait = 1000, index }: Props) {
   return <div>{data?.time}</div>;
 }
 ```
+
+#### queryFn
+
+```
+쿼리함수는 데이터를 가져오는 비동기 함수로,
+꼭 반환하거나 오류를 던져야 한다.
+에러는 error 객체로 확인이 가능하다.
+error는 기본적으로 null 이다.
+```
+
+##### qnueryFn 인수
+
+- queryKey: 이 쿼리의 쿼리 키
+- signal: 요청 취소에 사용하는 AbortSignal
+- client: 쿼리 클라이언트 인스턴스
+- meta: meta 옵션으로 지정한 추가 정보
+- pageParam: 페이지 번호(useInfiniteQuery에서만)
+
+###### 예시
+
+```tsx
+import { useQuery } from "@tanstack/react-query";
+
+export default function Hello() {
+  // data,error객체로 리턴 하여 error는 문제가 잇을경우 담아서, 리턴
+  const { data, error } = useQuery<string>({
+    queryKey: ["hello"], // 쿼리함수 Key 고유의키 값
+    queryFn: async () => {
+      // 쿼리함수의 함수 비동기로 실행
+      const res = await fetch("http://localhost:8080/hello");
+      const data = res.text();
+
+      if (!data) {
+        throw Error("데이터가 없습니다");
+      }
+      return data;
+    },
+    staleTime: 1000 * 10,
+    retry: 1,
+  });
+
+  return (
+    <>
+      <h1>{data}</h1>
+      {error && <p>{error.message}</p>}
+    </>
+  );
+}
+```
+
+#### skipToken
+
+```
+특정조건일때 쿼리를 실행하고 싶지 않을때 사용
+```
+
+```tsx
+const fetchUser = async (id: number) => {
+  const response = await fetch(`http://localhost:8080/users/${id}`);
+
+  if (!response.ok) {
+    throw new Error("문제가 발생하였습니다");
+  }
+
+  return response.text();
+};
+
+export default function UserInfo({ id }: Props) {
+  const { data, isPending, error } = useQuery({
+    queryKey: ["user", id],
+    queryFn: id ? () => fetchUser(id) : skipToken,
+  });
+
+  return (
+    <>
+      {isPending && <p>로딩중</p>}
+      {data && <p>{data}</p>}
+      {error && <p>{error.message}</p>}
+    </>
+  );
+}
+```
