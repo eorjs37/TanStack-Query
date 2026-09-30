@@ -127,3 +127,91 @@ export default function UserInfo({ id }: Props) {
   );
 }
 ```
+
+## 반환
+
+### 상태확인
+
+- isFetching: 쿼리 함수(queryFn)가 실행 중인지의 여부로, 데이터를 가져오는 중
+- isPending: 캐시된 데이터가 없고 쿼리가 아직 완료되지 않은 상태의 여부로, 즉 완전 초기상태
+- isLoading: 데이터가 없는 상태에서, 요청중인 상태
+
+### 다시 가져오기
+
+- refetch 함수: 캐시된 데이터 상관없이 API를 호출하여 가져오기
+
+```tsx
+const userQueryOptions = (id?: number) =>
+  queryOptions({
+    queryKey: ["user", id],
+    queryFn: id ? () => fetchUser(id) : skipToken,
+    staleTime: 1000 * 20,
+  });
+const { data, isPending, isLoading, isFetching, isStale, refetch } = useQuery(
+    userQueryOptions(id),
+);
+
+return (
+
+  <>
+    {isLoading ? (
+        <div>로딩중</div>
+      ) : (
+        <>
+          <p>{data}</p>
+          <p>데이터가 상했나요?: {JSON.stringify(isStale)}</p>
+          {/* reftch를 호출하면 캐시된데이터와 무관하게 항상 API를 호출한다 */}
+          <button disabled={isFetching} onClick={() => refetch()}>
+            {isFetching ? "데이터 가져오는 중.." : "데이터 다시가져오기"}
+          </button>
+        </>
+      )}
+  <>
+)
+```
+
+- queryClient객체의 query함수: 캐시된 데이터가 있으면 가져오고, 상했으면 API호출하여 갱신
+
+```tsx
+const userQueryOptions = (id?: number) =>
+  queryOptions({
+    queryKey: ["user", id],
+    queryFn: id ? () => fetchUser(id) : skipToken,
+    staleTime: 1000 * 20,
+  });
+
+const { data, isPending, isLoading, isFetching, isStale } = useQuery(
+    userQueryOptions(id),
+);
+
+async function refetchUser() {
+    // 캐시된 데이터가 있는 경우 캐시된 데이터를 가져오고, 아니면 API를 호출한다
+    const cachedUser = await queryClient.query(userQueryOptions(id));
+
+    console.log(cachedUser);
+}
+
+return (
+
+  <>
+    {isLoading ? (
+        <div>로딩중</div>
+      ) : (
+        <>
+          <p>{data}</p>
+          <p>데이터가 상했나요?: {JSON.stringify(isStale)}</p>
+          {/* reftch를 호출하면 캐시된데이터와 무관하게 항상 API를 호출한다 */}
+          <button disabled={isFetching} onClick={() => refetchUser()}>
+            {isFetching ? "데이터 가져오는 중.." : "데이터 다시가져오기"}
+          </button>
+        </>
+      )}
+  <>
+)
+```
+
+## useInfiniteQuery
+
+```
+무한 스크롤로 목록을 이어 붙이는 방식을 제공하는 Hook
+```
