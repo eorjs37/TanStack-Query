@@ -215,3 +215,41 @@ return (
 ```
 무한 스크롤로 목록을 이어 붙이는 방식을 제공하는 Hook
 ```
+
+### 사용법
+
+```ts
+const 반환 = useInfiniteQuery<리턴될타입>(옵션);
+```
+
+### 옵션
+
+```
+useQuery의 모든 옵션을 사용할 수 있음.
+```
+
+| 옵션                 | 설명                          |
+| -------------------- | ----------------------------- |
+| initialPageParam     | 초기 페이지 번호(필수)        |
+| getNextPageParam     | 다음 페이지 반환 함수(필수)   |
+| getPreviousPageParam | 이전 페이지의 번호 반환(옵션) |
+
+### 반환
+
+| 반환 속성                    | 설명                                        | 타입                                                                      |
+| :--------------------------- | :------------------------------------------ | :------------------------------------------------------------------------ |
+| **fetchNextPage**            | 다음 페이지를 가져오는 함수.                | `(options?: FetchNextPageOptions) => Promise<UseInfiniteQueryResult>`     |
+| **fetchPreviousPage**        | 이전 페이지를 가져오는 함수.                | `(options?: FetchPreviousPageOptions) => Promise<UseInfiniteQueryResult>` |
+| **hasNextPage**              | 다음 페이지가 있는지 여부.                  | `boolean`                                                                 |
+| **hasPreviousPage**          | 이전 페이지가 있는지 여부.                  | `boolean`                                                                 |
+| **isFetchingNextPage**       | 다음 페이지를 가져오는 중인지의 여부.       | `boolean`                                                                 |
+| **isFetchingPreviousPage**   | 이전 페이지를 가져오는 중인지의 여부.       | `boolean`                                                                 |
+| **isFetchNextPageError**     | 다음 페이지를 가져오다가 실패했는지의 여부. | `boolean`                                                                 |
+| **isFetchPreviousPageError** | 이전 페이지를 가져오다가 실패했는지의 여부. | `boolean`                                                                 |
+
+## useMutation
+
+```
+데이터 변경작업(생성/수정/삭제 등)을 위한 hook.
+useQuery는 데이터를 가져오는 기능 useMutation은 보내기에 집중하는 기능
+```
