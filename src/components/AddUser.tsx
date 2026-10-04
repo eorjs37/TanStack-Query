@@ -18,7 +18,7 @@ export default function AddUser() {
   const [age, setAge] = useState(0);
   const queryClient = useQueryClient();
 
-  useMutation({
+  const { mutate, error, isPending, isError } = useMutation({
     mutationFn: async (newUser: User) => {
       const res = await fetch("https://api.heropy.dev/v0/users", {
         method: "POST",
@@ -63,6 +63,7 @@ export default function AddUser() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    mutate({ name, age }); // 변이!
   };
   return (
     <form onSubmit={handleSubmit}>
@@ -78,7 +79,10 @@ export default function AddUser() {
         onChange={(e) => setAge(Number.parseInt(e.target.value, 10))}
         placeholder="사용자 나이"
       />
-      <button type="submit">사용자 추가하기!</button>
+      <button type="submit">
+        {isPending ? "사용자 추가 중.." : "사용자 추가하기!"}
+      </button>
+      {isError && <p>에러 발생: {error.message}</p>}
     </form>
   );
 }
